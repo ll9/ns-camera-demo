@@ -4,6 +4,7 @@
         <ScrollView>
         <StackLayout id="stack">
             <Button text="take a picture" @tap="takePicture" />
+            <Button text="from Gallery" @tap="getFromGallery" />
         </StackLayout>
         </ScrollView>
     </Page>
@@ -19,6 +20,11 @@ import {
   fromResource,
   fromBase64
 } from "tns-core-modules/image-source";
+import * as imagepicker from "nativescript-imagepicker";
+
+let context = imagepicker.create({
+  mode: "single" // use "multiple" for multiple selection
+});
 
 export default {
   data() {
@@ -52,6 +58,27 @@ export default {
             });
         })
         .catch(err => console.log(err));
+    },
+    getFromGallery() {
+      let stack = getElementById("stack");
+
+      context
+        .authorize()
+        .then(function() {
+          return context.present();
+        })
+        .then(function(selection) {
+          selection.forEach(function(selected) {
+            // process the selected image
+            console.log(selected);
+            var image = new imageModule.Image();
+            image.src = selected;
+            stack.addChild(image);
+          });
+        })
+        .catch(function(e) {
+          // process error
+        });
     }
   }
 };
